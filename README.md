@@ -1,1 +1,2 @@
-Conceptual implementation of Back Propagation in both Python and MATLAB
+Implementation of Back Propagation in Python, MATLAB, and C++
+
