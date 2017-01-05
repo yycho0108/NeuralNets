@@ -1,12 +1,13 @@
 import numpy as np
 from matplotlib import pyplot as plt
 import time
+import struct
 
 #Function generators
 def XOR_GEN():
     I = np.random.rand(1,2)
-    I = np.round(I).astype(int)
-    O = I[0][0]^I[0][1]
+    tI = np.round(I).astype(int)
+    O = tI[0][0]^tI[0][1]
     O = np.asarray(O)
     return I,O
 def MULT_GEN():
@@ -57,6 +58,7 @@ class Net:
         for i in range(1,self.length):
             self.W.append(np.random.randn(t[i-1],t[i]))
             self.B.append(np.random.randn(1,t[i]))
+        print self.W
     def FF(self,X):
         self.L[0].O = X
         for i in range(1,self.length):
@@ -74,24 +76,36 @@ class Net:
             self.B[i-1] += 0.6 * self.L[i].G
         return 0.5 * np.sum(G*G)
 
+def float_to_hex(f):
+    return hex(struct.unpack('<I', struct.pack('<f', f))[0])
+
 def main():
     t = [2,4,1]
     net = Net(t)
     G = []
     start = time.time()
     
-    for i in range(1000):
+    for i in range(10000):
         I,O = GEN()
         net.BP(I,O)
         G.append(net.BP(I,O))
     I,O = GEN()
 
     end = time.time()
-
     print("TOOK {} SECONDS".format(end-start))
     print("INPUT : ", I)
     print("TARGET : ", O)
     print("OUT : ", net.FF(I))
+
+    np.set_printoptions(formatter={'float':float_to_hex})
+    #np.array2string(x, formatter={'int':lambda x: hex(x)})
+    #np.savetxt('W.txt', net.W[0], fmt="%X")
+
+    print np.ndarray.flatten(net.W[0])
+    print np.ndarray.flatten(net.W[1])
+
+    print np.ndarray.flatten(net.B[0])
+    print np.ndarray.flatten(net.B[1])
 
     plt.plot(G)
     plt.show()
